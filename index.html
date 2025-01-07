@@ -85,6 +85,14 @@
             .container {
                 padding: 1.5rem;
                 margin: 10px;
+                width: calc(100% - 20px); /* Account for margins */
+                box-sizing: border-box;
+            }
+
+            input {
+                width: 100%;
+                max-width: 100%;
+                margin: 1rem auto;
             }
 
             h1 {
@@ -161,7 +169,7 @@
         }
 
         input {
-            width: 100%;
+            width: calc(100% - 24px); /* Account for padding */
             max-width: 300px;
             padding: 12px;
             margin: 1rem 0;
@@ -170,6 +178,7 @@
             font-size: 1rem;
             font-family: 'Space Mono', monospace;
             transition: border-color 0.3s;
+            box-sizing: border-box; /* Add this to include padding in width calculation */
         }
 
         input:focus {
@@ -365,7 +374,8 @@
             document.querySelector('.feedback').textContent = '';
             document.querySelector('.hint').textContent = '';
             document.getElementById('answer-input').value = '';
-            document.getElementById('answer-input').focus();
+            // Remove this line to prevent auto-focus
+            // document.getElementById('answer-input').focus();
             hintUsed = false;
         }
     
