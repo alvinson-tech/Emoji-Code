@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --warm-white: #faf7f2;
+            --container-bg: #ffffff;
+            --grid-color: rgb(230, 230, 230); /* New variable for grid color */
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            margin: 0;
+            min-height: 100vh;
+            background: var(--warm-white);
+            background-image: 
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px),
+                radial-gradient(circle at 90% 10%, rgba(147, 197, 253, 0.1) 0%, transparent 300px),
+                radial-gradient(circle at 10% 90%, rgba(249, 168, 212, 0.1) 0%, transparent 300px);
+            background-size: 20px 20px, 20px 20px, 100% 100%, 100% 100%;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .background-circle {
+            position: fixed;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, rgba(147, 197, 253, 0.1), rgba(186, 230, 253, 0.1));
+            top: -100px;
+            right: -100px;
+        }
+
+        .circle-2 {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, rgba(249, 168, 212, 0.1), rgba(244, 114, 182, 0.1));
+            bottom: -50px;
+            left: -50px;
+        }
+
+        .brand {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            z-index: 100;
+        }
+
+        .main-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            background: var(--container-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 
+                0 10px 15px -3px rgba(0, 0, 0, 0.05),
+                0 4px 6px -2px rgba(0, 0, 0, 0.02),
+                0 0 0 1px rgba(0, 0, 0, 0.02);
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 2rem !important;
+            }
+
+            .emoji {
+                font-size: 2.5rem !important;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group button {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .timer, .score {
+                position: static !important;
+                margin-bottom: 1rem;
+            }
+
+            input {
+                max-width: 100% !important;
+            }
+        }
+
+        h1 {
+            color: #1a1a1a;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        .emoji {
+            font-size: 3rem;
+            margin: 1.5rem 0;
+            letter-spacing: 1rem;
+        }
+
+        button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Space Mono', monospace;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: auto;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .hint-btn {
+            background: linear-gradient(135deg, #FFB74D, #FFA726);
+        }
+
+        .skip-btn {
+            background: linear-gradient(135deg, #9E9E9E, #757575);
+        }
+
+        input {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            margin: 1rem 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Space Mono', monospace;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        .feedback {
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+
+        .hint {
+            color: #666;
+            font-style: italic;
+            margin-top: 1rem;
+        }
+
+        .correct { color: #4CAF50; }
+        .incorrect { color: #f44336; }
+
+        #quiz-section, #results-section {
+            display: none;
+            text-align: center;
+        }
+
+        .progress {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .score {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .button-group {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 480px) {
+            .brand {
+                font-size: 1rem;
+                top: 10px;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .emoji {
+                font-size: 2rem;
+                letter-spacing: 0.5rem;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-circle circle-1"></div>
+    <div class="background-circle circle-2"></div>
+    <div class="brand">alvin.fun</div>
+    <div class="main-wrapper">
+        <div class="container">
+            <div id="welcome-section">
+                <h1>Emoji Code</h1>
+                <p class="subtitle">Decode the hidden messages behind emoji combinations!<br>All the answers are just one word!<br><br>Correct = 1 point | Hint = 0.5 point | Skip = 0 point</p>
+                <button onclick="startQuiz()">Start</button>
+            </div>
+
+            <div id="quiz-section">
+                <div class="timer">Time: 0:00</div>
+                <div class="score">Score: 0</div>
+                <div class="progress"></div>
+                <div class="emoji"></div>
+                <input type="text" id="answer-input" placeholder="Type your answer here..." onkeypress="checkEnter(event)">
+                <div class="button-group">
+                    <button onclick="checkAnswer()">Submit</button>
+                    <button class="hint-btn" onclick="showHint()">Hint</button>
+                    <button class="skip-btn" onclick="skipQuestion()">Skip</button>
+                </div>
+                <div class="feedback"></div>
+                <div class="hint"></div>
+            </div>
+
+            <div id="results-section">
+                <h2>Congratulations! 🎉</h2>
+                <p>You've completed all the emoji codes!</p>
+                <p class="completion-time"></p>
+                <p class="final-score"></p>
+                <p>Stay Tuned for more Questions!</p>
+                <button onclick="restartQuiz()">Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { emoji: "🌧️🎀", answer: "Rainbow", hint: "A Weather Condition" },
+            { emoji: "👁️⚽", answer: "Eyeball", hint: "Part of the Human Body" },
+            { emoji: "🥵🍫", answer: "HotChocolate", hint: "Food Item" },
+            { emoji: "🍮🐟", answer: "Jellyfish", hint: "Aquatic Animal" },
+            { emoji: "🔑📋", answer: "Keyboard", hint: "Electronic Gadget" },
+            { emoji: "🌶️🐕", answer: "HotDog", hint: "Food Item" },
+            { emoji: "🎬🌙", answer: "MovieNight", hint: "Fun Time" },
+            { emoji: "🧺⚽", answer: "Basketball", hint: "Sports" },
+            { emoji: "🍳🍰", answer: "Pancake", hint: "Food Item" },
+            { emoji: "🏖️🧙‍♀️", answer: "Sandwich", hint: "Food Item" },
+            { emoji: "🚒👂", answer: "Engineer", hint: "A Profession" },
+            { emoji: "👨‍🦱➡️", answer: "Mango", hint: "Fruit" },
+            { emoji: "🐝4️⃣", answer: "Before", hint: "Word" },
+            { emoji: "🌞🕶️", answer: "Sunglass", hint: "Item" },
+            { emoji: "🦁👑", answer: "LionKing", hint: "Movie" },
+            { emoji: "🕷️👨", answer: "Spiderman", hint: "Character OR Movie" },
+            { emoji: "⭐⚔️", answer: "StarWars", hint: "TV Show" },
+            { emoji: "🦇👨", answer: "Batman", hint: "Character OR Movie" },
+            { emoji: "❄️⚪", answer: "SnowWhite", hint: "Character" },
+            { emoji: "🌊👨", answer: "Aquaman", hint: "Character" },
+            { emoji: "🌙💡", answer: "Moonlight", hint: "A Weather Condition" },
+            { emoji: "🐜👨", answer: "Antman", hint: "Character" },
+            { emoji: "🌌🚢", answer: "Spaceship", hint: "Space" },
+            { emoji: "👁️📱", answer: "iPhone", hint: "Electronic Gadget" },
+            { emoji: "🪨⭐", answer: "Rockstar", hint: "Famous Performer" }
+        ];
+    
+        let currentQuestion = 0;
+        let startTime;
+        let timerInterval;
+        let score = 0;
+        let hintUsed = false;
+    
+        // Function to normalize answers for comparison
+        function normalizeAnswer(answer) {
+            // Remove extra spaces, convert to lowercase
+            return answer.toLowerCase().replace(/\s+/g, ' ').trim();
+        }
+    
+        function updateTimer() {
+            const currentTime = new Date();
+            const elapsedTime = Math.floor((currentTime - startTime) / 1000);
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            document.querySelector('.timer').textContent = 
+                `Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+    
+        function updateScore(points) {
+            score += points;
+            document.querySelector('.score').textContent = `Score: ${score.toFixed(1)}`;
+        }
+    
+        function startQuiz() {
+            document.getElementById('welcome-section').style.display = 'none';
+            document.getElementById('quiz-section').style.display = 'block';
+            startTime = new Date();
+            timerInterval = setInterval(updateTimer, 1000);
+            score = 0;
+            updateScore(0);
+            showQuestion();
+        }
+    
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            document.querySelector('.emoji').textContent = question.emoji;
+            document.querySelector('.progress').textContent = 
+                `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.querySelector('.feedback').textContent = '';
+            document.querySelector('.hint').textContent = '';
+            document.getElementById('answer-input').value = '';
+            document.getElementById('answer-input').focus();
+            hintUsed = false;
+        }
+    
+        function showHint() {
+            const hint = questions[currentQuestion].hint;
+            document.querySelector('.hint').textContent = `Hint: ${hint}`;
+            hintUsed = true;
+        }
+    
+        function skipQuestion() {
+            const feedback = document.querySelector('.feedback');
+            feedback.textContent = `Answer: ${questions[currentQuestion].answer}`;
+            feedback.className = 'feedback correct';
+            
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    showQuestion();
+                } else {
+                    showResults();
+                }
+            }, 2000);
+        }
+    
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        }
+    
+        function checkAnswer() {
+            const userAnswer = normalizeAnswer(document.getElementById('answer-input').value);
+            const correctAnswer = normalizeAnswer(questions[currentQuestion].answer);
+            const feedback = document.querySelector('.feedback');
+    
+            if (userAnswer === correctAnswer) {
+                feedback.textContent = 'Correct! 🎉';
+                feedback.className = 'feedback correct';
+                updateScore(hintUsed ? 0.5 : 1);
+                
+                setTimeout(() => {
+                    currentQuestion++;
+                    if (currentQuestion < questions.length) {
+                        showQuestion();
+                    } else {
+                        showResults();
+                    }
+                }, 1000);
+            } else {
+                feedback.textContent = 'Try again! 🤔';
+                feedback.className = 'feedback incorrect';
+            }
+        }
+    
+        function showResults() {
+            clearInterval(timerInterval);
+            const endTime = new Date();
+            const totalSeconds = Math.floor((endTime - startTime) / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            
+            document.getElementById('quiz-section').style.display = 'none';
+            document.getElementById('results-section').style.display = 'block';
+            document.querySelector('.completion-time').textContent = 
+                `Completion Time: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.querySelector('.final-score').textContent = 
+                `Final Score: ${score.toFixed(1)} points`;
+        }
+    
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById('results-section').style.display = 'none';
+            document.getElementById('quiz-section').style.display = 'block';
+            startTime = new Date();
+            timerInterval = setInterval(updateTimer, 1000);
+            updateScore(0);
+            showQuestion();
+        }
+    </script>
+</body>
+</html>
